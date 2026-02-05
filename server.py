@@ -64,12 +64,20 @@ class AdminSettings(BaseModel):
 # Initialize admin settings
 @app.on_event("startup")
 async def initialize_admin():
-    existing = await db.admin_settings.find_one({"_id": "admin"})
-    if not existing:
-        await db.admin_settings.insert_one({
-            "_id": "admin",
-            "pin": "1234"
-        })
+    logger.info("Initializing admin settings...")
+    try:
+        existing = await db.admin_settings.find_one({"_id": "admin"})
+        logger.info(f"Existing admin settings: {existing}")
+        if not existing:
+            await db.admin_settings.insert_one({
+                "_id": "admin",
+                "pin": "1234"
+            })
+            logger.info("Admin settings initialized with PIN 1234")
+        else:
+            logger.info("Admin settings already exist")
+    except Exception as e:
+        logger.error(f"Error initializing admin settings: {e}")
 
 # Routes
 @app.get("/")
