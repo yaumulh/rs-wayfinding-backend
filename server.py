@@ -72,16 +72,24 @@ async def initialize_admin():
         })
 
 # Routes
-@api_router.get("/")
+@app.get("/")
 async def root():
+    return {"message": "Hospital AR Navigation API"}
+
+@api_router.get("/")
+async def api_root():
     return {"message": "Hospital AR Navigation API"}
 
 # Admin PIN verification
 @api_router.post("/admin/verify-pin")
 async def verify_admin_pin(data: AdminPinVerify):
+    logger.info(f"Verifying PIN: {data.pin}")
     settings = await db.admin_settings.find_one({"_id": "admin"})
+    logger.info(f"Admin settings found: {settings}")
     if settings and settings.get("pin") == data.pin:
+        logger.info("PIN verified successfully")
         return {"success": True, "message": "PIN verified"}
+    logger.warning(f"PIN verification failed for PIN: {data.pin}")
     raise HTTPException(status_code=401, detail="Invalid PIN")
 
 # Location endpoints
